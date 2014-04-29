@@ -3305,6 +3305,8 @@ let
 
   elixir = callPackage ../development/interpreters/elixir { };
 
+  factor = callPackage ../development/interpreters/factor { };
+
   groovy = callPackage ../development/interpreters/groovy { };
 
   guile_1_8 = callPackage ../development/interpreters/guile/1.8.nix { };
