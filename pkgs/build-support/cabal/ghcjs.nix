@@ -1,13 +1,13 @@
 # generic builder for Cabal packages
 
-{ stdenv, fetchurl, lib, pkgconfig, ghc, Cabal, jailbreakCabal, glibcLocales
-, gnugrep, coreutils, hscolour
+{ stdenv, fetchurl, lib, pkgconfig, ghcjs, ghc, Cabal, jailbreakCabal, glibcLocales
+, gnugrep, coreutils, hscolour # hscolour is unused
 , enableLibraryProfiling ? false
 , enableSharedLibraries ? false
 , enableSharedExecutables ? false
 , enableStaticLibraries ? true
 , enableCheckPhase ? stdenv.lib.versionOlder "7.4" ghc.version
-, enableHyperlinkSource ? true
+, enableHyperlinkSource ? false
 , extension ? (self : super : {})
 }:
 
@@ -18,24 +18,7 @@ let
   optionals             = stdenv.lib.optionals;
   optionalString        = stdenv.lib.optionalString;
   filter                = stdenv.lib.filter;
-
-  defaultSetupHs        = builtins.toFile "Setup.hs" ''
-                            import Distribution.Simple
-                            main = defaultMain
-                          '';
 in
-
-# Cabal shipped with GHC 6.12.4 or earlier doesn't know the "--enable-tests configure" flag.
-assert enableCheckPhase -> versionOlder "7" ghc.version;
-
-# GHC prior to 7.4.x doesn't know the "--enable-executable-dynamic" flag.
-assert enableSharedExecutables -> versionOlder "7.4" ghc.version;
-
-# Our GHC 6.10.x builds do not provide sharable versions of their core libraries.
-assert enableSharedLibraries -> versionOlder "6.12" ghc.version;
-
-# Pure shared library builds don't work before GHC 7.8.x.
-assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
 
 {
   mkDerivation =
@@ -74,13 +57,13 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             # fname.
             name = if self.isLibrary then
                      if enableLibraryProfiling && self.enableSharedLibraries then
-                       "haskell-${self.pname}-ghc${ghc.ghc.version}-${self.version}-profiling-shared"
+                       "haskell-${self.pname}-ghcjs${ghc.ghc.version}-${self.version}-profiling-shared"
                      else if enableLibraryProfiling && !self.enableSharedLibraries then
-                       "haskell-${self.pname}-ghc${ghc.ghc.version}-${self.version}-profiling"
+                       "haskell-${self.pname}-ghcjs${ghc.ghc.version}-${self.version}-profiling"
                      else if !enableLibraryProfiling && self.enableSharedLibraries then
-                       "haskell-${self.pname}-ghc${ghc.ghc.version}-${self.version}-shared"
+                       "haskell-${self.pname}-ghcjs${ghc.ghc.version}-${self.version}-shared"
                      else
-                       "haskell-${self.pname}-ghc${ghc.ghc.version}-${self.version}"
+                       "haskell-${self.pname}-ghcjs${ghc.ghc.version}-${self.version}"
                    else
                      "${self.pname}-${self.version}";
 
@@ -94,10 +77,9 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             # default buildInputs are just ghc, if more buildInputs are required
             # buildInputs can be extended by the client by using extraBuildInputs,
             # but often propagatedBuildInputs is preferable anyway
-            buildInputs = [ghc Cabal] ++ self.extraBuildInputs;
+            buildInputs = [ghc ghc.ghc.parent.CabalGhcjs] ++ self.extraBuildInputs;
             extraBuildInputs = self.buildTools ++
                                (optionals self.doCheck self.testDepends) ++
-                               (optional self.hyperlinkSource hscolour) ++
                                (if self.pkgconfigDepends == [] then [] else [pkgconfig]) ++
                                (if self.isLibrary then [] else self.buildDepends ++ self.extraLibraries ++ self.pkgconfigDepends);
 
@@ -140,11 +122,11 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             jailbreak = false;
 
             # pass the '--enable-split-objs' flag to cabal in the configure stage
-            enableSplitObjs = !stdenv.isDarwin;         # http://hackage.haskell.org/trac/ghc/ticket/4013
+            enableSplitObjs = false; # !stdenv.isDarwin;         # http://hackage.haskell.org/trac/ghc/ticket/4013
 
             # pass the '--enable-tests' flag to cabal in the configure stage
             # and run any regression test suites the package might have
-            doCheck = enableCheckPhase;
+            doCheck = false; #enableCheckPhase;
 
             # pass the '--hyperlink-source' flag to ./Setup haddock
             hyperlinkSource = enableHyperlinkSource;
@@ -168,7 +150,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             extraConfigureFlags = [
               (enableFeature self.enableSplitObjs "split-objs")
               (enableFeature enableLibraryProfiling "library-profiling")
-              (enableFeature self.enableSharedLibraries "shared")
+              (enableFeature true "shared")
               (optional (versionOlder "7" ghc.version) (enableFeature self.enableStaticLibraries "library-vanilla"))
               (optional (versionOlder "7.4" ghc.version) (enableFeature self.enableSharedExecutables "executable-dynamic"))
               (optional (versionOlder "7" ghc.version) (enableFeature self.doCheck "tests"))
@@ -182,16 +164,18 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             configurePhase = ''
               eval "$preConfigure"
 
-              ${optionalString self.jailbreak "${jailbreakCabal}/bin/jailbreak-cabal ${self.pname}.cabal"}
+              ${optionalString self.jailbreak "${ghc.ghc.parent.jailbreakCabal}/bin/jailbreak-cabal ${self.pname}.cabal"}
 
-              for i in Setup.hs Setup.lhs ${defaultSetupHs}; do
-                test -f $i && break
+              PATH=$PATH:${ghc.ghc.ghc}/bin
+
+              for i in Setup.hs Setup.lhs; do
+                test -f $i && ghc --make $i
               done
-              ghc --make -o Setup -odir $TMPDIR $i
 
-              for p in $extraBuildInputs $propagatedNativeBuildInputs; do
-                if [ -d "$p/lib/ghc-${ghc.ghc.version}/package.conf.d" ]; then
-                  # Haskell packages don't need any extra configuration.
+              for p in $extraBuildInputs $propagatedBuildInputs $propagatedNativeBuildInputs; do
+                PkgDir="$p/lib/ghcjs-${ghc.ghc.version}_ghc-${ghc.ghc.ghc.version}/package.conf.d"
+                if [ -f "$PkgDir/package.cache" ]; then
+                  extraConfigureFlags+=" --package-db=$PkgDir"
                   continue;
                 fi
                 if [ -d "$p/include" ]; then
@@ -204,18 +188,17 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
                 done
               done
 
+              configureFlags+=" --package-db=${ghc.ghc}${ghc.ghc.libdir}/ghcjs/package.conf.d"
+
               ${optionalString (self.enableSharedExecutables && self.stdenv.isLinux) ''
-                configureFlags+=" --ghc-option=-optl=-Wl,-rpath=$out/lib/${ghc.ghc.name}/${self.pname}-${self.version}"
+                configureFlags+=" --ghc-option=-optl=-Wl,-rpath=$out/lib/${ghc.ghc.name}/${self.pname}-${self.version}";
               ''}
               ${optionalString (self.enableSharedExecutables && self.stdenv.isDarwin) ''
-                configureFlags+=" --ghc-option=-optl=-Wl,-headerpad_max_install_names"
-              ''}
-              ${optionalString (versionOlder "7.8" ghc.version) ''
-                configureFlags+=" --ghc-option=-j$NIX_BUILD_CORES"
+                configureFlags+=" --ghc-option=-optl=-Wl,-headerpad_max_install_names";
               ''}
 
               echo "configure flags: $extraConfigureFlags $configureFlags"
-              ./Setup configure --verbose --prefix="$out" --libdir='$prefix/lib/$compiler' \
+              ./Setup configure --ghcjs --verbose --prefix="$out" --libdir='$prefix/lib/$compiler' \
                 --libsubdir='$pkgid' $extraConfigureFlags $configureFlags 2>&1 \
               ${optionalString self.strictConfigurePhase ''
                 | ${coreutils}/bin/tee "$NIX_BUILD_TOP/cabal-configure.log"
@@ -235,8 +218,8 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
               ./Setup build ${self.buildTarget}
 
               export GHC_PACKAGE_PATH=$(${ghc.GHCPackages})
-              test -n "$noHaddock" || ./Setup haddock --html --hoogle \
-                  ${optionalString self.hyperlinkSource "--hyperlink-source"}
+              #test -n "$noHaddock" || ./Setup haddock --html --hoogle \
+              #    ${optionalString self.hyperlinkSource "--hyperlink-source"}
 
               eval "$postBuild"
             '';
@@ -257,16 +240,17 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
 
               ./Setup copy
 
-              mkdir -p $out/bin # necessary to get it added to PATH
+              ensureDir $out/bin # necessary to get it added to PATH
 
-              local confDir=$out/lib/ghc-${ghc.ghc.version}/package.conf.d
+              local confDir=$out/lib/ghcjs-${ghc.ghc.version}_ghc-${ghc.ghc.ghc.version}/package.conf.d
               local installedPkgConf=$confDir/${self.fname}.installedconf
               local pkgConf=$confDir/${self.fname}.conf
-              mkdir -p $confDir
+              ensureDir $confDir
               ./Setup register --gen-pkg-config=$pkgConf
               if test -f $pkgConf; then
                 echo '[]' > $installedPkgConf
-                GHC_PACKAGE_PATH=$installedPkgConf ghc-pkg --global register $pkgConf --force
+                GHC_PACKAGE_PATH=$installedPkgConf ghcjs-pkg --global register $pkgConf --force --package-db=$confDir || true
+                ghcjs-pkg recache --package-db=$confDir
               fi
 
               if test -f $out/nix-support/propagated-native-build-inputs; then
@@ -274,7 +258,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
               fi
 
               ${optionalString (self.enableSharedExecutables && self.isExecutable && self.stdenv.isDarwin) ''
-                for exe in "$out/bin/"* ; do
+                for exe in $out/bin/* ; do
                   install_name_tool -add_rpath $out/lib/${ghc.ghc.name}/${self.pname}-${self.version} $exe || true # Ignore failures, which seem to be due to hitting bash scripts rather than binaries
                 done
               ''}
