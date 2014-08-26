@@ -3,7 +3,7 @@
 { cabal, attoparsec, attoparsecEnumerator, blazeBuilder
 , blazeBuilderEnumerator, caseInsensitive, enumerator, HsOpenSSL
 , MonadCatchIOTransformers, mtl, network, snapCore, text, time
-, unixCompat
+, unixCompat, HsOpenSSL, useOpenssl ? false
 }:
 
 cabal.mkDerivation (self: {

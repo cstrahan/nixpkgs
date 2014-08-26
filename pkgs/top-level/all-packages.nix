@@ -3334,6 +3334,7 @@ let
   haskellPackages_ghc783_profiling    = recurseIntoAttrs haskell.packages_ghc783.profiling;
   haskellPackages_ghc783              = recurseIntoAttrs haskell.packages_ghc783.highPrio;
   haskellPackages_ghcHEAD = haskell.packages_ghcHEAD;
+  haskellPackages_ghcjs = haskell.packages_ghcjs;
 
   haxe = callPackage ../development/compilers/haxe { };
 
