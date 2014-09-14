@@ -31,13 +31,10 @@ let
     };
     buildDepends = [ primitive ];
   });
-  # TODO: include haddock api in haskell packages
 in cabal.mkDerivation (self: rec {
-  # TODO: get rid of this
-  libdir = "/share/ghcjs";
-
   pname = "ghcjs";
-  version = "0.1.0";
+  # the version reflects the binary names, e.g. ghcjs
+  version = "0.1.0-7.8.3";
   src = fetchgit {
     url = git://github.com/ghcjs/ghcjs.git;
     rev = "346627db9991059b6d50fe04fe10efde12837676";
@@ -58,18 +55,17 @@ in cabal.mkDerivation (self: rec {
     transformersCompat QuickCheck hspec xhtml
     regexPosix haddockApi
   ];
-  buildTools = [ nodejs git ghcjsPrim ];
+  buildTools = [ nodejs ghcjsPrim ];
   testDepends = [
     HUnit testFramework testFrameworkHunit
   ];
   patches = [ ./ghcjs.patch ];
   postPatch = ''
     substituteInPlace src/Compiler/Info.hs --replace "@PREFIX@" "$out"
-    substituteInPlace src-bin/Boot.hs --replace "@PREFIX@" "$out"
+    substituteInPlace src-bin/Boot.hs --replace "@PREFIX@" "$out" \
+                                      --replace "@COMPILER@" "ghcjs-0.1.0-7.8.3"
   '';
   postInstall = ''
-    #export HOME=$(pwd)
-
     local topDir=$out/share/ghcjs
     mkdir -p $topDir
 
@@ -79,7 +75,6 @@ in cabal.mkDerivation (self: rec {
     cp -r ${shims} $topDir/shims
     chmod -R u+w $topDir/shims
 
-    #${cabalInstallGhcjs}/bin/cabal-js update # CCS: was this really necessary?
     PATH=$out/bin:${CabalGhcjs}/bin:$PATH LD_LIBRARY_PATH=${gmp}/lib:${gcc.gcc}/lib64:$LD_LIBRARY_PATH \
       env -u GHC_PACKAGE_PATH $out/bin/ghcjs-boot \
         --dev \
