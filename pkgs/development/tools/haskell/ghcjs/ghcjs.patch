@@ -52,7 +52,7 @@ index 0c31ce2..b8f32eb 100644
             , "--with-hc-pkg",   ghcjsPkg ^. pgmLocText
 -           , "--prefix",        toTextI instDir
 +           , "--prefix",        "@PREFIX@"
-+           , "--libdir",        "$prefix/lib/$compiler"
++           , "--libdir",        "$prefix/lib/@COMPILER@"
 +           , "--libsubdir",     "$pkgid"
             , bool haddock "--enable-documentation" "--disable-documentation"
             , "--haddock-html"
