@@ -1,8 +1,8 @@
 { stdenv, ghc, makeWrapper, coreutils, writeScript }:
 let
   lib = stdenv.lib;
-  isGhcjs = (ghcName == "ghcjs");
   ghcName = (builtins.parseDrvName ghc.name).name;
+  isGhcjs = (ghcName == "ghcjs");
   ghc761OrLater = isGhcjs || !stdenv.lib.versionOlder ghc.version "7.6.1";
   packageDBFlag = if ghc761OrLater then "-package-db" else "-package-conf";
 
@@ -54,6 +54,10 @@ stdenv.mkDerivation {
 
   buildInputs = [makeWrapper];
   propagatedBuildInputs = [ghc];
+
+  #passthru = {
+  #  nativeGhc = 
+  #};
 
   unpackPhase = "true";
   installPhase = ''

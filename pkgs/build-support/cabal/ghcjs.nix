@@ -19,8 +19,9 @@ let
   optionalString        = stdenv.lib.optionalString;
   filter                = stdenv.lib.filter;
 
-  isGhcjs               = stdenv.lib.hasPrefix "ghcjs" ghc.name;
-  ghcName               = if isGhcjs then "ghcjs" else "ghc";
+  ghcName               = ghc.ghc.pname;
+  compilerVersion       = "${ghcName}-${ghc.ghc.version}";
+  isGhcjs               = (ghcName == "ghcjs");
 
   defaultSetupHs        = builtins.toFile "Setup.hs" ''
                             import Distribution.Simple
@@ -77,13 +78,13 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             # fname.
             name = if self.isLibrary then
                      if enableLibraryProfiling && self.enableSharedLibraries then
-                       "haskell-${self.pname}-ghc${ghc.ghc.version}-${self.version}-profiling-shared"
+                       "haskell-${self.pname}-${ghcName}${ghc.ghc.version}-${self.version}-profiling-shared"
                      else if enableLibraryProfiling && !self.enableSharedLibraries then
-                       "haskell-${self.pname}-ghc${ghc.ghc.version}-${self.version}-profiling"
+                       "haskell-${self.pname}-${ghcName}${ghc.ghc.version}-${self.version}-profiling"
                      else if !enableLibraryProfiling && self.enableSharedLibraries then
-                       "haskell-${self.pname}-ghc${ghc.ghc.version}-${self.version}-shared"
+                       "haskell-${self.pname}-${ghcName}${ghc.ghc.version}-${self.version}-shared"
                      else
-                       "haskell-${self.pname}-ghc${ghc.ghc.version}-${self.version}"
+                       "haskell-${self.pname}-${ghcName}${ghc.ghc.version}-${self.version}"
                    else
                      "${self.pname}-${self.version}";
 
@@ -190,10 +191,10 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
               for i in Setup.hs Setup.lhs ${defaultSetupHs}; do
                 test -f $i && break
               done
-              ghc --make -o Setup -odir $TMPDIR $i
+              ${ghcName} --make -o Setup -odir $TMPDIR $i
 
               for p in $extraBuildInputs $propagatedNativeBuildInputs; do
-                if [ -d "$p/lib/ghc-${ghc.ghc.version}/package.conf.d" ]; then
+                if [ -d "$p/lib/${compilerVersion}/package.conf.d" ]; then
                   # Haskell packages don't need any extra configuration.
                   continue;
                 fi
@@ -208,7 +209,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
               done
 
               ${optionalString (self.enableSharedExecutables && self.stdenv.isLinux) ''
-                configureFlags+=" --ghc-option=-optl=-Wl,-rpath=$out/lib/${ghc.ghc.name}/${self.pname}-${self.version}"
+                configureFlags+=" --ghc-option=-optl=-Wl,-rpath=$out/lib/${compilerVersion}/${self.pname}-${self.version}"
               ''}
               ${optionalString (self.enableSharedExecutables && self.stdenv.isDarwin) ''
                 configureFlags+=" --ghc-option=-optl=-Wl,-headerpad_max_install_names"
@@ -262,14 +263,14 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
 
               mkdir -p $out/bin # necessary to get it added to PATH
 
-              local confDir=$out/lib/ghc-${ghc.ghc.version}/package.conf.d
+              local confDir=$out/lib/${compilerVersion}/package.conf.d
               local installedPkgConf=$confDir/${self.fname}.installedconf
               local pkgConf=$confDir/${self.fname}.conf
               mkdir -p $confDir
               ./Setup register --gen-pkg-config=$pkgConf
               if test -f $pkgConf; then
                 echo '[]' > $installedPkgConf
-                GHC_PACKAGE_PATH=$installedPkgConf ghc-pkg --global register $pkgConf --force
+                GHC_PACKAGE_PATH=$installedPkgConf ${ghcName}-pkg --global register $pkgConf --force
               fi
 
               if test -f $out/nix-support/propagated-native-build-inputs; then
@@ -278,7 +279,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
 
               ${optionalString (self.enableSharedExecutables && self.isExecutable && self.stdenv.isDarwin) ''
                 for exe in "$out/bin/"* ; do
-                  install_name_tool -add_rpath $out/lib/${ghc.ghc.name}/${self.pname}-${self.version} $exe || true # Ignore failures, which seem to be due to hitting bash scripts rather than binaries
+                  install_name_tool -add_rpath $out/lib/${compilerVersion}/${self.pname}-${self.version} $exe || true # Ignore failures, which seem to be due to hitting bash scripts rather than binaries
                 done
               ''}
 
