@@ -7450,6 +7450,8 @@ let
 
   net_snmp = callPackage ../servers/monitoring/net-snmp { };
 
+  nrsysmond = callPackage ../servers/monitoring/nrsysmond { };
+
   riemann = callPackage ../servers/monitoring/riemann { };
 
   oidentd = callPackage ../servers/identd/oidentd { };
