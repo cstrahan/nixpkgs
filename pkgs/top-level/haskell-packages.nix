@@ -930,6 +930,7 @@ self : let callPackage = x : y : modifyPrio (newScope self x y); in
 
   ghcjs = callPackage ../development/tools/haskell/ghcjs {
     Cabal = self.Cabal_1_18_1_3;
+    network = self.network_2_6_0_2;
   };
 
   ghcjsDom = callPackage ../development/libraries/haskell/ghcjs-dom {};

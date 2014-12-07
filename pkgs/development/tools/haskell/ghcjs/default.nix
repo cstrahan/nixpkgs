@@ -1,7 +1,7 @@
 { nodejs, cabal, filepath, HTTP, HUnit, mtl, network, QuickCheck, random, stm
 , testFramework, testFrameworkHunit, testFrameworkQuickcheck2, time
 , zlib, aeson, attoparsec, bzlib, dataDefault, ghcPaths, hashable
-, haskellSrcExts, haskellSrcMeta, lens, optparseApplicative
+, haskellSrcExts, haskellSrcMeta, lens, optparseApplicative_0_11_0_1
 , parallel, safe, shelly, split, stringsearch, syb, systemFileio
 , systemFilepath, tar, terminfo, textBinary, unorderedContainers
 , vector, wlPprintText, yaml, fetchgit, Cabal, CabalGhcjs, cabalInstall
@@ -47,13 +47,13 @@ in cabal.mkDerivation (self: rec {
   buildDepends = [
     filepath HTTP mtl network random stm time zlib aeson attoparsec
     bzlib dataDefault ghcPaths hashable haskellSrcExts haskellSrcMeta
-    lens optparseApplicative parallel safe shelly split
+    lens optparseApplicative_0_11_0_1 parallel safe shelly split
     stringsearch syb systemFileio systemFilepath tar terminfo textBinary
     unorderedContainers vector wlPprintText yaml
     alex happy git gnumake gcc autoconf automake libtool patch gmp
-    base16Bytestring cryptohash executablePath
+    base16Bytestring cryptohash executablePath haddockApi
     transformersCompat QuickCheck hspec xhtml
-    regexPosix haddockApi
+    ghcjsPrim regexPosix
   ];
   buildTools = [ nodejs ghcjsPrim ];
   testDepends = [

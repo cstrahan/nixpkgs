@@ -24,6 +24,7 @@ cabal.mkDerivation (self: {
   # Cabal. Use the flag --package-db to specify a package database (it can be used
   # multiple times).
   doCheck = false;
+  noHaddock = true;
 
   buildDepends = [
     filepath HTTP mtl network random stm time zlib QuickCheck
