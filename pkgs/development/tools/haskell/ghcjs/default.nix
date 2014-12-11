@@ -9,7 +9,7 @@
 , automake, libtool, cabalInstallGhcjs, gmp, base16Bytestring
 , cryptohash, executablePath, transformersCompat
 , haddockApi, hspec, xhtml, primitive, cacert, pkgs, ghc
-, coreutils
+, coreutils, makeWrapper
 }:
 let
   ghcjsBoot = fetchgit {
@@ -56,7 +56,7 @@ in cabal.mkDerivation (self: rec {
     transformersCompat QuickCheck hspec xhtml
     ghcjsPrim regexPosix
   ];
-  buildTools = [ nodejs ghcjsPrim ];
+  buildTools = [ nodejs ghcjsPrim makeWrapper ];
   testDepends = [
     HUnit testFramework testFrameworkHunit
   ];
@@ -83,7 +83,14 @@ in cabal.mkDerivation (self: rec {
         --with-cabal ${cabalInstallGhcjs}/bin/cabal-js \
         --with-gmp-includes ${gmp}/include \
         --with-gmp-libraries ${gmp}/lib
+
+    # TODO: figure out why the rpath for libHSghcjs-0.1.0-ghc7.8.3.so isn't
+    # being set at compile time
+    for prog in ghcjs-0.1.0-7.8.3 ghcjs-boot-0.1.0-7.8.3 ghcjs-pkg-0.1.0-7.8.3 ghcjs-run-0.1.0-7.8.3 haddock-ghcjs-0.1.0-7.8.3 hsc2hs-ghcjs-0.1.0-7.8.3; do
+      wrapProgram $out/bin/$prog --prefix LD_LIBRARY_PATH : $out/lib/ghc-7.8.3/ghcjs-0.1.0
+    done
   '';
+
   meta = {
     homepage = "https://github.com/ghcjs/ghcjs";
     description = "GHCJS is a Haskell to JavaScript compiler that uses the GHC API";
