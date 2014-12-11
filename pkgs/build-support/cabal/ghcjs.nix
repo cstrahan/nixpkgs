@@ -1,13 +1,13 @@
 # generic builder for Cabal packages
 
 { stdenv, fetchurl, lib, pkgconfig, ghc, Cabal, jailbreakCabal, glibcLocales
-, gnugrep, coreutils, hscolour
+, gnugrep, coreutils, hscolour, nodejs
 , enableLibraryProfiling ? false
 , enableSharedLibraries ? false
 , enableSharedExecutables ? false
 , enableStaticLibraries ? true
 , enableCheckPhase ? stdenv.lib.versionOlder "7.4" ghc.version
-, enableHyperlinkSource ? true
+, enableHyperlinkSource ? false
 , extension ? (self : super : {})
 }:
 
@@ -98,7 +98,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             # default buildInputs are just ghc, if more buildInputs are required
             # buildInputs can be extended by the client by using extraBuildInputs,
             # but often propagatedBuildInputs is preferable anyway
-            buildInputs = [ghc Cabal] ++ self.extraBuildInputs;
+            buildInputs = [nodejs ghc Cabal] ++ self.extraBuildInputs;
             extraBuildInputs = self.buildTools ++
                                (optionals self.doCheck self.testDepends) ++
                                (optional self.hyperlinkSource hscolour) ++
@@ -150,7 +150,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             # and run any regression test suites the package might have
             doCheck = enableCheckPhase;
 
-            # pass the '--hyperlink-source' flag to ./Setup haddock
+            # pass the '--hyperlink-source' flag to node ./Setup.jsexe/all.js haddock
             hyperlinkSource = enableHyperlinkSource;
 
             # abort the build if the configure phase detects that the package
@@ -219,7 +219,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
               ''}
 
               echo "configure flags: $extraConfigureFlags $configureFlags"
-              ./Setup configure --verbose --prefix="$out" --libdir='$prefix/lib/$compiler' \
+              node ./Setup.jsexe/all.js configure --ghcjs --verbose --prefix="$out" --libdir='$prefix/lib/$compiler' \
                 --libsubdir='$pkgid' $extraConfigureFlags $configureFlags 2>&1 \
               ${optionalString self.strictConfigurePhase ''
                 | ${coreutils}/bin/tee "$NIX_BUILD_TOP/cabal-configure.log"
@@ -236,10 +236,10 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             buildPhase = ''
               eval "$preBuild"
 
-              ./Setup build ${self.buildTarget}
+              node ./Setup.jsexe/all.js build ${self.buildTarget}
 
               export GHC_PACKAGE_PATH=$(${ghc.GHCPackages})
-              test -n "$noHaddock" || ./Setup haddock --html --hoogle \
+              test -n "$noHaddock" || ./Setup.jsexe haddock --html --hoogle \
                   ${optionalString self.hyperlinkSource "--hyperlink-source"}
 
               eval "$postBuild"
@@ -248,7 +248,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             checkPhase = optional self.doCheck ''
               eval "$preCheck"
 
-              ./Setup test ${self.testTarget}
+              node ./Setup.jsexe/all.js test ${self.testTarget}
 
               eval "$postCheck"
             '';
@@ -259,7 +259,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
             installPhase = ''
               eval "$preInstall"
 
-              ./Setup copy
+              node ./Setup.jsexe/all.js copy
 
               mkdir -p $out/bin # necessary to get it added to PATH
 
@@ -267,7 +267,7 @@ assert !enableStaticLibraries -> versionOlder "7.7" ghc.version;
               local installedPkgConf=$confDir/${self.fname}.installedconf
               local pkgConf=$confDir/${self.fname}.conf
               mkdir -p $confDir
-              ./Setup register --gen-pkg-config=$pkgConf
+              node ./Setup.jsexe/all.js register --gen-pkg-config=$pkgConf
               if test -f $pkgConf; then
                 echo '[]' > $installedPkgConf
                 GHC_PACKAGE_PATH=$installedPkgConf ${ghcName}-pkg --global register $pkgConf --force
