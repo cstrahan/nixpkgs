@@ -1,8 +1,8 @@
 diff --git a/src-bin/Boot.hs b/src-bin/Boot.hs
-index 0c31ce2..b8f32eb 100644
+index ed348db..422ad7c 100644
 --- a/src-bin/Boot.hs
 +++ b/src-bin/Boot.hs
-@@ -503,9 +503,7 @@ initPackageDB :: B ()
+@@ -510,9 +510,7 @@ initPackageDB :: B ()
  initPackageDB = do
    msg info "creating package databases"
    initDB "--global" <^> beLocations . blGlobalDB
@@ -12,7 +12,7 @@ index 0c31ce2..b8f32eb 100644
      initDB dbName db = do
        rm_rf db >> mkdir_p db
        ghcjs_pkg_ ["init", toTextI db] `catchAny_` return ()
-@@ -529,29 +527,22 @@ installDevelopmentTree = subTop $ do
+@@ -536,29 +534,22 @@ installDevelopmentTree = subTop $ do
    msgD info $ "preparing development boot tree"
    checkpoint' "ghcjs-boot-git" "ghcjs-boot repository already cloned and prepared" $ do
      testGit "ghcjs-boot" >>= \case
@@ -46,7 +46,7 @@ index 0c31ce2..b8f32eb 100644
        mapM_ patchPackage =<< allPackages
        preparePrimops
        buildGenPrim
-@@ -1046,7 +1037,9 @@ cabalInstallFlags parmakeGhcjs = do
+@@ -1093,7 +1084,9 @@ cabalInstallFlags parmakeGhcjs = do
             , "--builddir",      "dist"
             , "--with-compiler", ghcjs ^. pgmLocText
             , "--with-hc-pkg",   ghcjsPkg ^. pgmLocText
@@ -58,10 +58,10 @@ index 0c31ce2..b8f32eb 100644
             , "--haddock-html"
             , "--haddock-hoogle"
 diff --git a/src/Compiler/Info.hs b/src/Compiler/Info.hs
-index cae352a..cd58dc1 100644
+index 2e19849..7bca9ec 100644
 --- a/src/Compiler/Info.hs
 +++ b/src/Compiler/Info.hs
-@@ -52,12 +52,8 @@ compilerInfo nativeToo dflags = do
+@@ -48,12 +48,8 @@ compilerInfo nativeToo dflags = do
  -- | the directory to use if started without -B flag
  getDefaultTopDir :: IO FilePath
  getDefaultTopDir = do

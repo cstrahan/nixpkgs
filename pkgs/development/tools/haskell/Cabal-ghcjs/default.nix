@@ -8,8 +8,8 @@ cabal.mkDerivation (self: {
   version = "9e87d6a3";
   src = fetchgit {
     url = git://github.com/ghcjs/cabal.git;
-    rev = "520591876ee57dbecba1b2de602dc79f4f67ecce"; # Must be from the ghcjs branch
-    sha256 = "f59182661707c65a2a014aa91b5e0d53cbefb6c999c1982757f476619b6728c0";
+    rev = "7471c95f230170342bbdc7bcb8881d5d06145f95"; # Must be from the ghcjs branch
+    sha256 = "1z7bz4zb3y2rnvlq6d64s5nhpw0v8fhlmjk0hzvp6pfj8gdv1fx4";
   };
   preConfigure = "cd Cabal";
   configureFlags = "--program-suffix=-js";

@@ -9,25 +9,26 @@
 , automake, libtool, cabalInstallGhcjs, gmp, base16Bytestring
 , cryptohash, executablePath, transformersCompat
 , haddockApi, hspec, xhtml, primitive, cacert, pkgs, ghc
+, coreutils
 }:
 let
   ghcjsBoot = fetchgit {
     url = git://github.com/ghcjs/ghcjs-boot.git;
-    rev = "f5e57f9d4d8241a78ebdbdb34262921782a27e1a";
-    sha256 = "1688zan65k36cv4hbzkx48kcmpkn8pswdacl6anrb6079wb06v5q";
+    rev = "8bf2861c0c776eec42e0a1833f220e36681e810c";
+    sha256 = "0fwnng56d1y98fpp2s9yl9xy21584p7fsszr4m9d3wmjciiazcv2";
   };
   shims = fetchgit {
     url = git://github.com/ghcjs/shims.git;
-    rev = "dc5bb54778f3dbba4b463f4f7df5f830f14d1cb6";
-    sha256 = "1kn9czzz8n16k4dbjc2q75yrpwz3w31sfhl6380v2d87vxwjivzw";
+    rev = "5e11d33cb74f8522efca0ace8365c0dc994b10f6";
+    sha256 = "13i78wd064v0nvvx6js5wqw6s01hhf1s7z03c4465xp64a817gk4";
   };
   ghcjsPrim = cabal.mkDerivation (self: {
     pname = "ghcjs-prim";
     version = "0.1.0.0";
     src = fetchgit {
       url = git://github.com/ghcjs/ghcjs-prim.git;
-      rev = "659d6ceb45b1b8ef526c7451d90afff80d76e2f5";
-      sha256 = "55b64d93cdc8220042a35ea12f8c53e82f78b51bc0f87ddd12300ad56e4b7ba7";
+      rev = "915f263c06b7f4a246c6e02ecdf2b9a0550ed967";
+      sha256 = "11ngifn822d8ac5p139g32rafa0wf319yl3blh6piknhwav5ip9l";
     };
     buildDepends = [ primitive ];
   });
@@ -37,8 +38,8 @@ in cabal.mkDerivation (self: rec {
   version = "0.1.0-7.8.3";
   src = fetchgit {
     url = git://github.com/ghcjs/ghcjs.git;
-    rev = "346627db9991059b6d50fe04fe10efde12837676";
-    sha256 = "1h2cvnprlf8328b68v3p05nk92ksywx7g5isz2rrb8izkhvax9nl";
+    rev = "5c2d279982466e076223fcbe1e1096e22956e5a9";
+    sha256 = "07zpdvpbmk9rg4iwffi7rdjr4icr1j2kkskg2a520ffhid77phqb";
   };
   isLibrary = true;
   isExecutable = true;
@@ -61,6 +62,7 @@ in cabal.mkDerivation (self: rec {
   ];
   patches = [ ./ghcjs.patch ];
   postPatch = ''
+    substituteInPlace Setup.hs --replace "/usr/bin/env" "${coreutils}/bin/env"
     substituteInPlace src/Compiler/Info.hs --replace "@PREFIX@" "$out"
     substituteInPlace src-bin/Boot.hs --replace "@PREFIX@" "$out" \
                                       --replace "@COMPILER@" "ghcjs-0.1.0-7.8.3"

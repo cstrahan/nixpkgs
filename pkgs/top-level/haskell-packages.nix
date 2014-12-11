@@ -2563,8 +2563,6 @@ self : let callPackage = x : y : modifyPrio (newScope self x y); in
 
   textBinary = callPackage ../development/libraries/haskell/text-binary {};
 
-  textBinary = callPackage ../development/libraries/haskell/text-binary {};
-
   textFormat = callPackage ../development/libraries/haskell/text-format {};
 
   textIcu = callPackage ../development/libraries/haskell/text-icu {};
@@ -3150,18 +3148,8 @@ self : let callPackage = x : y : modifyPrio (newScope self x y); in
   };
   cabalInstall = self.cabalInstall_1_20_0_3;
 
-  CabalGhcjs = callPackage ../development/tools/haskell/Cabal-ghcjs {
-    QuickCheck = self.QuickCheck_2_6;
-    testFrameworkQuickcheck2 = self.testFrameworkQuickcheck2.override {
-      QuickCheck = self.QuickCheck_2_6;
-    };
-  };
-  cabalInstallGhcjs = callPackage ../development/tools/haskell/cabal-install-ghcjs {
-    QuickCheck = self.QuickCheck_2_6;
-    testFrameworkQuickcheck2 = self.testFrameworkQuickcheck2.override {
-      QuickCheck = self.QuickCheck_2_6;
-    };
-  };
+  CabalGhcjs = callPackage ../development/tools/haskell/Cabal-ghcjs {};
+  cabalInstallGhcjs = callPackage ../development/tools/haskell/cabal-install-ghcjs {};
 
   codex = callPackage ../development/tools/haskell/codex {};
 
