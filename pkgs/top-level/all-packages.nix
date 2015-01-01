@@ -774,6 +774,8 @@ let
     inherit (strategoPackages016) strategoxt sdf;
   };
 
+  bitcasa = callPackage ../applications/backup/bitcasa { };
+
   bittornado = callPackage ../tools/networking/p2p/bit-tornado { };
 
   blueman = callPackage ../tools/bluetooth/blueman {
