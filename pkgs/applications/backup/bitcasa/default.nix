@@ -42,3 +42,16 @@ stdenv.mkDerivation rec {
   '';
 
 }
+
+/*
+
+NOTES:
+
+Tries to read `/etc/issue`, and then subsequently segfaults.
+Making `/etc/issue` contain 'Ubuntu ' is sufficient to make it happy.
+
+Tries to open `/etc/fuse.conf`, which asserts because the file does not exist.
+
+Asserts that the user is in the `fuse` group.
+
+*/
