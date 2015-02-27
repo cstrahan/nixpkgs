@@ -7458,6 +7458,10 @@ let
     enableIntrospection = false;
   };
 
+  webrtc_HEAD = callPackage ../development/libraries/webrtc {
+    inherit (gnome) GConf;
+  };
+
   websocketpp = callPackage ../development/libraries/websocket++ { };
 
   wildmidi = callPackage ../development/libraries/wildmidi { };
