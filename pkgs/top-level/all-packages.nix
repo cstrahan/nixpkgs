@@ -1162,6 +1162,15 @@ let
 
   dosfstools = callPackage ../tools/filesystems/dosfstools { };
 
+  # TODO: sort these attrs.
+  nuget = nuget-bootstrap;
+  nuget-bootstrap = callPackage ../build-support/nuget/bootstrap.nix { };
+
+  dotnet = callPackage ../development/compilers/coreclr {
+    stdenv = clangStdenv;
+    llvm = llvm_35;
+  };
+
   dotnetfx35 = callPackage ../development/libraries/dotnetfx35 { };
 
   dotnetfx40 = callPackage ../development/libraries/dotnetfx40 { };
