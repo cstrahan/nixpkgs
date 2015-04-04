@@ -36,6 +36,38 @@ self: super: {
   # Cabal_1_22_1_1 requires filepath >=1 && <1.4
   cabal-install = dontCheck (super.cabal-install.override { Cabal = null; });
 
+  # requires qualifiers due to name collisions with time-1.5
+  HStringTemplate = appendPatch (doJailbreak super.HStringTemplate) ./HStringTemplate-0.7.3-ghc710.patch;
+
+  # update gtk2hs versions, until hackage-pacakges.nix is updated.
+  cairo = overrideCabal super.cairo (drv: {
+    version = "0.13.1.0";
+    sha256 = "0vi7glzizi2nvv0p5wsdxlpkx3f1875jpij26k2j4h0h6z53z3kb";
+  });
+  gio = overrideCabal super.gio (drv: {
+    version = "0.13.1.0";
+    sha256 = "1qxbdjznxz56jw108cc78lzwh1r4g8l2jcaz2bh2akc1nwhv2x5j";
+  });
+  glib = overrideCabal super.glib (drv: {
+    version = "0.13.1.0";
+    sha256 = "11scv2imljnr6ng7692jdagr7fc924hgfwfbnw4a5sra3w7ja7fz";
+  });
+  gtk = overrideCabal super.gtk (drv: {
+    version = "0.13.6";
+    sha256 = "1xj3vafk6rhy5nifixsp72n88i0idlknggcq1w626jfszx5anx2c";
+  });
+  pango = overrideCabal super.pango (drv: {
+    version = "0.13.1.0";
+    sha256 = "0s69ga5gn9grdqcfxkbnvk0f3malql3fnhzh9cwvpfzqk3hxn4hn";
+  });
+
+  # update taffybar version, until hackage-pacakges.nix is updated.
+  taffybar = overrideCabal super.taffybar (drv: {
+    version = "0.4.5";
+    sha256 = "0igwq5gmfki61igrs6v51pm8r3wz8pzv6iz8dw30nmqgr3ypddlw";
+    buildDepends = drv.buildDepends ++ [self.time-locale-compat];
+  });
+
   # We have Cabal 1.22.x.
   jailbreak-cabal = super.jailbreak-cabal.override { Cabal = null; };
 

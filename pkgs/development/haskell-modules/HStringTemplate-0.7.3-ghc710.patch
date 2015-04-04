@@ -1,0 +1,74 @@
+diff --git a/Text/StringTemplate/Instances.hs.old b/Text/StringTemplate/Instances.hs
+index 6326572..de636e4 100644
+--- a/Text/StringTemplate/Instances.hs.old
++++ b/Text/StringTemplate/Instances.hs
+@@ -14,8 +14,8 @@ import Data.Array
+ import Data.Maybe
+ import qualified Data.Foldable as F
+ import qualified System.Time as OldTime
+-import System.Locale
+-import Data.Time
++import System.Locale as SL
++import Data.Time as DT
+ import Data.Void
+ import qualified Data.Text as T
+ import qualified Data.Text.Encoding as T
+@@ -96,49 +96,49 @@ instance (Integral a, Show a) => ToSElem (Ratio a) where
+ --Dates and Times
+ instance StringTemplateShows OldTime.CalendarTime where
+     stringTemplateShow = OldTime.calendarTimeToString
+-    stringTemplateFormattedShow = OldTime.formatCalendarTime defaultTimeLocale
++    stringTemplateFormattedShow = OldTime.formatCalendarTime SL.defaultTimeLocale
+ instance ToSElem OldTime.CalendarTime where
+     toSElem = stShowsToSE
+ 
+ instance StringTemplateShows OldTime.TimeDiff where
+     stringTemplateShow = OldTime.timeDiffToString
+-    stringTemplateFormattedShow = OldTime.formatTimeDiff defaultTimeLocale
++    stringTemplateFormattedShow = OldTime.formatTimeDiff SL.defaultTimeLocale
+ instance ToSElem OldTime.TimeDiff where
+     toSElem = stShowsToSE
+ 
+ instance StringTemplateShows Day where
+     stringTemplateShow = show
+-    stringTemplateFormattedShow = formatTime defaultTimeLocale
++    stringTemplateFormattedShow = formatTime DT.defaultTimeLocale
+ instance ToSElem Day where
+     toSElem = stShowsToSE
+ 
+ instance StringTemplateShows LocalTime where
+     stringTemplateShow = show
+-    stringTemplateFormattedShow = formatTime defaultTimeLocale
++    stringTemplateFormattedShow = formatTime DT.defaultTimeLocale
+ instance ToSElem LocalTime where
+     toSElem = stShowsToSE
+ 
+ instance StringTemplateShows TimeOfDay where
+     stringTemplateShow = show
+-    stringTemplateFormattedShow = formatTime defaultTimeLocale
++    stringTemplateFormattedShow = formatTime DT.defaultTimeLocale
+ instance ToSElem TimeOfDay where
+     toSElem = stShowsToSE
+ 
+ instance StringTemplateShows UTCTime where
+     stringTemplateShow = show
+-    stringTemplateFormattedShow = formatTime defaultTimeLocale
++    stringTemplateFormattedShow = formatTime DT.defaultTimeLocale
+ instance ToSElem UTCTime where
+     toSElem = stShowsToSE
+ 
+ instance StringTemplateShows TimeZone where
+     stringTemplateShow = show
+-    stringTemplateFormattedShow = formatTime defaultTimeLocale
++    stringTemplateFormattedShow = formatTime DT.defaultTimeLocale
+ instance ToSElem TimeZone where
+     toSElem = stShowsToSE
+ 
+ instance StringTemplateShows ZonedTime where
+     stringTemplateShow = show
+-    stringTemplateFormattedShow = formatTime defaultTimeLocale
++    stringTemplateFormattedShow = formatTime DT.defaultTimeLocale
+ instance ToSElem ZonedTime where
+     toSElem = stShowsToSE
+ 
+
