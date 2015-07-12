@@ -10083,6 +10083,12 @@ let
     };
   };
 
+  pyindicate = callPackage ../development/libraries/libindicate {
+    pythonPackages = self;
+    gtkVersion = 2;
+    gtk = pkgs.gtk2;
+  };
+
   pyinotify = buildPythonPackage rec {
     name = "pyinotify";
     version = "0.9.5";

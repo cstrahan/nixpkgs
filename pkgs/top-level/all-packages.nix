@@ -2064,6 +2064,24 @@ let
 
   libibverbs = callPackage ../development/libraries/libibverbs { };
 
+  libindicate = callPackage ../development/libraries/libindicate {
+    python = null;
+    gtkVersion = null;
+    gtk = null;
+  };
+
+  libindicate_gtk2 = callPackage ../development/libraries/libindicate {
+    python = null;
+    gtkVersion = 2;
+    gtk = gtk2;
+  };
+
+  libindicate_gtk3 = callPackage ../development/libraries/libindicate {
+    python = null;
+    gtkVersion = 3;
+    gtk = gtk3;
+  };
+
   libxcomp = callPackage ../development/libraries/libxcomp { };
 
   libx86emu = callPackage ../development/libraries/libx86emu { };
