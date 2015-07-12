@@ -6792,6 +6792,19 @@ let
     inherit sqlite libmysql;
   };
 
+  libdbusmenu_glib = callPackage ../development/libraries/libdbusmenu-glib {
+    gtk = null;
+    gtkVersion = null;
+  };
+  libdbusmenu_gtk2 = callPackage ../development/libraries/libdbusmenu-glib {
+    gtk = gtk2;
+    gtkVersion = 2;
+  };
+  libdbusmenu_gtk3 = callPackage ../development/libraries/libdbusmenu-glib {
+    gtk = gtk3;
+    gtkVersion = 3;
+  };
+
   libdbusmenu_qt = callPackage ../development/libraries/libdbusmenu-qt { };
   libdbusmenu_qt5 = callPackage ../development/libraries/libdbusmenu-qt/qt5.nix { };
 
