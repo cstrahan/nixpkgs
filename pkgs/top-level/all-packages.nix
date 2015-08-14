@@ -10086,6 +10086,8 @@ let
 
   pipework = callPackage ../os-specific/linux/pipework { };
 
+  playonlinux = callPackage ../os-specific/linux/playonlinux { };
+
   plymouth = callPackage ../os-specific/linux/plymouth { };
 
   pmount = callPackage ../os-specific/linux/pmount { };
