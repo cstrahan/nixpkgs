@@ -1,0 +1,15 @@
+diff --git a/vdirsyncer/storage/dav.py b/vdirsyncer/storage/dav.py
+index b51486a..25cdbcb 100644
+--- a/vdirsyncer/storage/dav.py
++++ b/vdirsyncer/storage/dav.py
+@@ -599,6 +599,10 @@ class DavStorage(Storage):
+         for prop in root.findall('.//' + lxml_selector):
+             text = getattr(prop, 'text', None)
+             if text:
++                #if isinstance(text, etree.CDATA):
++                #    text = str(text)
++                dav_logger.debug('TYPE: {!r}'.format(type(text)))
++                dav_logger.debug('TEXT TYPE: {!r}'.format(text_type))
+                 return text
+ 
+     def set_meta(self, key, value):

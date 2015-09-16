@@ -13086,7 +13086,11 @@ let
 
   vcprompt = callPackage ../applications/version-management/vcprompt { };
 
-  vdirsyncer = callPackage ../tools/misc/vdirsyncer { };
+  vdirsyncer = callPackage ../tools/misc/vdirsyncer {
+    # we need python3 to prevent various unicode problems:
+    # https://github.com/untitaker/vdirsyncer/issues/268
+    pythonPackages = python3Packages;
+  };
 
   vdpauinfo = callPackage ../tools/X11/vdpauinfo { };
 
