@@ -9744,6 +9744,10 @@ let
 
   sambaFull = samba4Full;
 
+  sandstorm = callPackage ../servers/sandstorm {
+    #clang = clang_36;
+  };
+
   shairport-sync = callPackage ../servers/shairport-sync { };
 
   serfdom = goPackages.serf.bin // { outputs = [ "bin" ]; };
