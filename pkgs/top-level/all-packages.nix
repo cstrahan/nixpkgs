@@ -2858,6 +2858,9 @@ let
 
   prey-bash-client = callPackage ../tools/security/prey { };
 
+  private-internet-access = callPackage ../tools/networking/private-internet-access {
+  };
+
   profile-cleaner = callPackage ../tools/misc/profile-cleaner { };
 
   profile-sync-daemon = callPackage ../tools/misc/profile-sync-daemon { };
