@@ -13584,6 +13584,8 @@ in
     autoAwaySupport = config.profanity.autoAwaySupport or true;
   };
 
+  psdoom-ng = callPackage ../applications/misc/psdoom-ng { };
+
   pstree = callPackage ../applications/misc/pstree { };
 
   pulseview = callPackage ../applications/science/electronics/pulseview { };
