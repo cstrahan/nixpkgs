@@ -9696,6 +9696,10 @@ in
 
   unicon-lang = callPackage ../development/interpreters/unicon-lang {};
 
+  universalscenedescription = callPackage ../development/libraries/universalscenedescription {
+    boost = boost155;
+  };
+
   tsocks = callPackage ../development/libraries/tsocks { };
 
   unixODBC = callPackage ../development/libraries/unixODBC { };
