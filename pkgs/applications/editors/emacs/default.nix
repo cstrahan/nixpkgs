@@ -8,7 +8,12 @@
 , withXwidgets ? false, webkitgtk24x ? null, wrapGAppsHook ? null, glib_networking ? null
 , withCsrc ? true
 , srcRepo ? false, autoconf ? null, automake ? null, texinfo ? null
-}:
+, with24BitColors ? false
+}@args:
+
+# 24-bit color patches require srcRepo=true
+let srcRepo = (args.srcRepo or false) || with24BitColors;
+in
 
 assert (libXft != null) -> libpng != null;      # probably a bug
 assert stdenv.isDarwin -> libXaw != null;       # fails to link otherwise
@@ -53,6 +58,16 @@ stdenv.mkDerivation rec {
     (fetchurl {
       url = http://git.savannah.gnu.org/cgit/emacs.git/patch/?id=43986d16fb6ad78a627250e14570ea70bdb1f23a;
       sha256 = "1wlyy04qahvls7bdrcxaazh9k27gksk7if1q58h83f7h6g9xxkzj";
+    })
+  ] ++ lib.optionals with24BitColors [
+    # 24-bit color support was merged into HEAD; will be available in 26.1
+    (fetchurl {
+      url = http://git.savannah.gnu.org/cgit/emacs.git/patch/?id=464a51ed46990554bed8a9443168c976d6c3c6d3;
+      sha256 = "0hzyljv8c0njv6bmgzkl4mjfzqhnbqfzyp9hnvhs26b5s97va20y";
+    })
+    (fetchurl {
+      url = http://git.savannah.gnu.org/cgit/emacs.git/patch/?id=e463e5762bbe628be3d15da066a90f079a8468b3;
+      sha256 = "1mzzfwysk9yabil5z707wj88g6kakdjihiniyca4gg3rlxn46m5b";
     })
   ];
 
