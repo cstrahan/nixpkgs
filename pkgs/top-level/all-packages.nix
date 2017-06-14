@@ -9207,6 +9207,8 @@ with pkgs;
 
   linenoise = callPackage ../development/libraries/linenoise { };
 
+  linenoise-ng = callPackage ../development/libraries/linenoise-ng { };
+
   lirc = callPackage ../development/libraries/lirc { };
 
   liquid-dsp = callPackage ../development/libraries/liquid-dsp { };
@@ -15292,6 +15294,8 @@ with pkgs;
   orpie = callPackage ../applications/misc/orpie { gsl = gsl_1; };
 
   osmo = callPackage ../applications/office/osmo { };
+
+  osquery = callPackage ../tools/system/osquery { };
 
   palemoon = callPackage ../applications/networking/browsers/palemoon {
     # https://forum.palemoon.org/viewtopic.php?f=57&t=15296#p111146
