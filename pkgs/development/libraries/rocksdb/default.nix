@@ -8,6 +8,8 @@
 , jemalloc ? null, gperftools ? null
 }:
 
+
+
 let
   malloc = if jemalloc != null then jemalloc else gperftools;
 in
@@ -33,7 +35,7 @@ stdenv.mkDerivation rec {
   PORTABLE = "1";
   USE_SSE = "1";
   CMAKE_CXX_FLAGS = "-std=gnu++11";
-  JEMALLOC_LIB = stdenv.lib.optionalString (malloc == jemalloc) "-ljemalloc";
+  JEMALLOC_LIB = stdenv.lib.optionalString (jemalloc != null) "-ljemalloc";
 
   buildFlags = [
     "DEBUG_LEVEL=0"
