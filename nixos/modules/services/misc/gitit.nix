@@ -634,7 +634,7 @@ video/x-ms-wmx  wmx
     oauthcallback: ${toString cfg.oauthCallback}
     oauthauthorizeendpoint: ${toString cfg.oauthAuthorizeEndpoint}
     oauthaccesstokenendpoint: ${toString cfg.oauthAccessTokenEndpoint}
-    github-org: ${toString cfg.githubOrg}
+    #github-org: ${toString cfg.githubOrg}
   '';
 
 in

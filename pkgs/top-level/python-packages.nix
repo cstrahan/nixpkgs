@@ -11339,11 +11339,11 @@ in {
   };
 
   gcovr = buildPythonPackage rec {
-    name = "gcovr-2.4";
+    name = "gcovr-3.3";
 
     src = pkgs.fetchurl {
       url = "mirror://pypi/g/gcovr/${name}.tar.gz";
-      sha256 = "2c878e03c2eff2282e64035bec0a30532b2b1173aadf08486401883b79e4dab1";
+      sha256 = "15y2skkgvw16z2hafffaxbzb6mpw16lf7x3alv4iq46xznga7hcy";
     };
 
     meta = {
