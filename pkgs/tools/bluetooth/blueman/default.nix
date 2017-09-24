@@ -32,6 +32,7 @@ in stdenv.mkDerivation rec {
   configureFlags = [ (lib.enableFeature withPulseAudio "pulseaudio") ];
 
   preFixup = ''
+    pythonPath="$pythonPath $out"
     makeWrapperArgs="--prefix PATH ':' ${binPath}"
     wrapPythonProgramsIn "$out/bin" "$pythonPath"
     wrapPythonProgramsIn "$out/libexec" "$pythonPath"
