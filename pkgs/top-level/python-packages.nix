@@ -303,6 +303,29 @@ in {
 
   actdiag = callPackage ../development/python-modules/actdiag { };
 
+  Adafruit_BluefruitLE = buildPythonPackage rec {
+    version = "0.9.9";
+    pname = "Adafruit_BluefruitLE";
+    name = "${pname}-${version}";
+
+    #buildInputs = with self; [ python pkgs.pkgconfig pkgs.libnotify pygobject2 pygtk pkgs.glib pkgs.gtk2 pkgs.dbus_glib ];
+    propagatedBuildInputs = with self; [ future dbus-python pkgs.glib pygobject3 ];
+
+    src = pkgs.fetchFromGitHub {
+      owner = "adafruit";
+      repo = "Adafruit_Python_BluefruitLE";
+      rev = "6aac710e11277ad3c0617cf1226016dda22e225b";
+      sha256 = "0zsk40r6agnpd7h4yfjkpzf0nxgx6kw2p92zrx0p336g02lfavdl";
+    };
+
+    meta = {
+      description = "Python library for interacting with Bluefruit LE (Bluetooth low energy) devices on Linux or OSX";
+      license = licenses.mit;
+      maintainers = with maintainers; [ cstrahan ];
+    };
+  };
+
+
   adal = callPackage ../development/python-modules/adal { };
 
   afew = callPackage ../development/python-modules/afew { };
@@ -2069,6 +2092,30 @@ in {
 
   blaze = callPackage ../development/python-modules/blaze { };
 
+  bluepy = buildPythonPackage rec {
+    version = "1.1.2";
+    pname = "bluepy";
+    name = "${pname}-${version}";
+
+    buildInputs = with self; [  ];
+    nativeBuildInputs = with pkgs; [ pkgconfig ];
+    propagatedBuildInputs = with self; [ pkgs.glib ];
+    #dontPatchELF = true;
+    dontStrip = true;
+
+    src = fetchPypi {
+      inherit pname version;
+      sha256 = "1jd92knw3x1ka6hxgsnp9983j5ibi0h7w6g6q71aw0labpkp9k2j";
+    };
+
+    meta = {
+      description = "Python module for interfacing with BLE devices through Bluez";
+      license = licenses.gpl2;
+      maintainers = with maintainers; [ cstrahan ];
+    };
+  };
+
+
   # Needed for FlexGet 1.2.337 and calibre 2.76.0
   html5lib_0_9999999 = self.html5lib.override rec {
     name = "html5lib-${version}";
@@ -2117,6 +2164,26 @@ in {
       downloadPage = https://github.com/mozilla/bleach/releases;
       license = licenses.asl20;
       maintainers = with maintainers; [ prikhi ];
+    };
+  };
+
+  bleep = buildPythonPackage rec {
+    version = "0.4.3";
+    pname = "bleep";
+    name = "${pname}-${version}";
+
+    buildInputs = with self; [ setuptools_scm ];
+    propagatedBuildInputs = with self; [ gattlib future ];
+
+    src = fetchPypi {
+      inherit pname version;
+      sha256 = "165mpljiqb0gxbfwjd47d2rn71kd3h686fhsynpvyrsckapbjzxs";
+    };
+
+    meta = {
+      description = "Bluetooth Low Energy (BLE) Library for Python";
+      license = licenses.gpl2;
+      maintainers = with maintainers; [ cstrahan ];
     };
   };
 
@@ -6079,6 +6146,71 @@ in {
     '';
   };
 
+  #gattlib = buildPythonPackage rec {
+  #  version = "unstable-20170808";
+  #  pname = "gattlib";
+  #  name = "${pname}-${version}";
+
+  #  nativeBuildInputs = with pkgs; [ cmake pkgconfig ];
+
+  #  propagatedBuildInputs = with self; [ pkgs.bluez pkgs.glib ];
+
+  #  src = pkgs.fetchFromGitHub {
+  #    owner = "labapart";
+  #    repo = "${pname}";
+  #    rev = "01d5c51a0c508f982ba7c905deb3cd737db3c5be";
+  #    sha256 = "14sdc41kdp05if646ha3rja60ss9iyfrl4cbma3hd50kjwp13320";
+  #  };
+
+  #  preBuild = ''
+  #    #mkdir build && cd build
+  #    #cmake ..
+
+  #    cmake .
+  #    make
+
+  #    ls -la
+  #  '';
+
+  #  # the tests do not pass
+  #  #doCheck = false;
+
+  #  meta = {
+  #    description = "Bluetooth Python extension module";
+  #    license = licenses.gpl2;
+  #    maintainers = with maintainers; [ leenaars ];
+  #  };
+  #};
+
+  gattlib = buildPythonPackage rec {
+    version = "unstable-20161201";
+    pname = "gattlib";
+    name = "${pname}-${version}";
+
+    nativeBuildInputs = with pkgs; [ pkgconfig ];
+
+    propagatedBuildInputs = with self; [ boost pkgs.bluez pkgs.glib ];
+
+    src = pkgs.fetchhg {
+      url = "https://bitbucket.org/OscarAcena/pygattlib";
+      rev = "a858e8626a93cb9b4ad56f3fb980a6517a0702c6";
+      sha256 = "1afdc17c59an53sgpm3fidii4imk61py14jlylpqmryy87fhv04x";
+    };
+
+    #preBuild = ''
+    #  NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-error"
+    #'';
+
+    # the tests do not pass
+    #doCheck = false;
+
+    meta = {
+      description = "Bluetooth Python extension module";
+      license = licenses.gpl2;
+      maintainers = with maintainers; [ leenaars ];
+    };
+  };
+
   gcutil = buildPythonPackage rec {
     name = "gcutil-1.16.1";
 
@@ -7749,7 +7881,7 @@ in {
     pname = "pybluez";
     name = "${pname}-${version}";
 
-    propagatedBuildInputs = with self; [ pkgs.bluez ];
+    propagatedBuildInputs = with self; [ pkgs.bluez gattlib ];
 
     src = pkgs.fetchFromGitHub {
       owner = "karulis";
@@ -13488,6 +13620,26 @@ in {
       homepage = http://www.pygal.org;
       license = licenses.lgpl3;
       maintainers = with maintainers; [ sjourdois ];
+    };
+  };
+
+  pygatt = buildPythonPackage rec {
+    version = "3.2.0";
+    pname = "pygatt";
+    name = "${pname}-${version}";
+
+    buildInputs = with self; [ nose ];
+    propagatedBuildInputs = with self; [ pyserial enum-compat pexpect ];
+
+    src = fetchPypi {
+      inherit pname version;
+      sha256 = "11x7r5cfadjqx47z9y5q4pssj3shajs0w3hqlafbpi0l7028vhby";
+    };
+
+    meta = {
+      description = "Python Bluetooth LE (Low Energy) and GATT Library";
+      license = licenses.mit;
+      maintainers = with maintainers; [ cstrahan ];
     };
   };
 

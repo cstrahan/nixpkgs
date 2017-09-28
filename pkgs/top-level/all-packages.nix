@@ -7132,6 +7132,8 @@ with pkgs;
 
   openocd = callPackage ../development/tools/misc/openocd { };
 
+  openocd-nrf5 = callPackage ../development/tools/misc/openocd/nrf5.nix { };
+
   oprofile = callPackage ../development/tools/profiling/oprofile { };
 
   pahole = callPackage ../development/tools/misc/pahole {};
