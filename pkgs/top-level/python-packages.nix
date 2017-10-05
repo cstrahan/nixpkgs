@@ -2777,6 +2777,32 @@ in {
     };
   };
 
+  certbot-s3front = buildPythonPackage rec {
+    pname = "certbot-s3front";
+    version = "0.3.1";
+    name = "${pname}-${version}";
+
+    src = fetchPypi {
+      inherit pname version;
+      sha256 = "0jx3zarqcz6dwnjkyd82nai0n9rqylmgfkraljc4f0gc5zp99h1i";
+    };
+
+    propagatedBuildInputs = [
+      pkgs.certbot
+      self.boto3
+      self.docutils
+    ];
+
+    # No tests in archive
+    #doCheck = false;
+
+    meta = {
+      homepage = "https://github.com/dlapiduz/certbot-s3front";
+      license = licenses.mit;
+      description = "Certbot CLI plugin for S3/CloudFront validation and installation";
+    };
+  };
+
   certifi = callPackage ../development/python-modules/certifi { };
 
   characteristic = callPackage ../development/python-modules/characteristic { };
